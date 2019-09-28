@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Creación y captura de código Qr</title>
+    <script type="text/javascript" src="js/instascan.min.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/qrcode.min.js"></script>
+   
+    <style>
+        body {
+            background-color: aqua;
+        }
+        #preview {
+            width:320px;
+            height:240px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+           
+        }
+        #ncqr {
+            width:320px;
+            height:240px;
+            margin:15px;
+            float:left;
+        }
+       
+        div #escanear, #crear, #borrar {
+           margin-left: auto;
+           margin-right: auto;
+           float: center;
+        }
+        
+        h1 {
+            text-align: center;
+        }
+    </style>
+
+</head>
+<body>
+ <h1>En esta página puedes escanear códigos qr y crearlos.</h1>
+  
+     <div>
+         
+      <video id="video"></video>
+      <canvas id="canvas"></canvas>
+      <button id="startbutton">Press to scan</button>
+       
+      <button id="crear" onclick="createQr()">Press to create</button>
+      
+      <button id="borrar" onclick="borrarQr()">Press to delete</button>
+         
+      <div id="ncqr"></div>
+         
+    </div>
+      
+      <script type="text/javascript">
+         
+      (function() {
+
+  var streaming = false,
+      video        = document.querySelector('#video'),
+      canvas       = document.querySelector('#canvas'),
+      startbutton  = document.querySelector('#startbutton'),
+      width = 320,
+      height = 0;
+
+  navigator.getMedia = ( navigator.getUserMedia ||
+                         navigator.webkitGetUserMedia ||
+                         navigator.mozGetUserMedia ||
+                         navigator.msGetUserMedia);
+
+  navigator.getMedia(
+    {
+      video: true,
+      audio: false
+    },
+    function(stream) {
+      if (navigator.mozGetUserMedia) {
+        video.mozSrcObject = stream;
+      } else {
+        var vendorURL = window.URL || window.webkitURL;
+        video.srcObject = stream;
+      }
+      video.play();
+    },
+    function(err) {
+      console.log("An error occured! " + err);
+    }
+  );
+
+
+
+})();
+      // Se crea un objeto de tipo Instascan y se le asigna el id de la etiqueta video de html5
+      let scanner = new Instascan.Scanner({
+        video:document.getElementById('video')
+      });
+          
+      function scanfunction() {
+
+      let result = scanner.scan();
+          if(result != null){
+              alert(result.content);
+          } else 
+              alert ("el código escaneado no es válido"); 
+      }
+      
+      
+          
+      function createQr () {
+          var newQR = prompt ("Escriba algo por favor");
+           
+          // (código simple) var qrcode = new QRCode(document.getElementById("ncqr"), newQR);
+          
+          // con opciones
+              var qrcode = new QRCode("ncqr", {
+              text: newQR,
+              width: 130,
+              height: 130,
+              colorDark : "#000000",
+              colorLight : "#ffffff",
+              correctLevel : QRCode.CorrectLevel.L
+          });
+          
+         
+      }
+      
+      function borrarQr() {
+             var capa = document.getElementById('ncqr').innerHTML='';
+             capa.style.display="none";
+             capa.style.visibility="hidden";
+      }
+     
+      
+      
+      scanner.addListener('scan', function(content){
+            console.log(content);
+       }); 
+      
+      // se le asigna un event listener al objeto de html 5 button con la etiqueta escanear
+     
+      document.getElementById("startbutton").addEventListener('click', scanfunction);
+      
+          
+    
+      
+  
+        
+    </script>
+  
+  
+  
+</body>
+</html>
